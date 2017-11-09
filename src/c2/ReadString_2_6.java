@@ -8,9 +8,10 @@ import java.util.Scanner;
 /**
  * @author Juan Munoz
  *
+ * Leer un numero limitado de objetos String: devolver un String[]
+ * En caso de que sea necesario se expande dinamicamente el string
  */
 public class ReadString_2_6 {
-
 	
 	public static String[] getString(){
 		Scanner in = new Scanner(System.in);
