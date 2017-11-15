@@ -8,7 +8,7 @@ import java.awt.Button;
 import javax.swing.JPanel;
 
 /**
- * @author BRM05461
+ * @author Juan Munoz
  *
  */
 public class Ejemplo_2_2_4 {
