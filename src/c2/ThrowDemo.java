@@ -20,7 +20,11 @@ public class ThrowDemo {
 	 */
 	public static void main(String[] args) {
 		for(String fileName : args){
-			
+			try {
+				processFile(fileName);
+			} catch (Exception e) {
+				System.err.println(e);
+			}
 		}
 	}
 
