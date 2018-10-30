@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 /**
  * @author Juan Munoz
- * Ejercicio de la figura 2.15
+ * Ejercicio de la figura 2.19
  * Ejemplo de Archivos Secuenciales 2.6.3
  * Como argumentos se pasan un listado de archivos, y el programa se encarga 
  * de leer el contenido (linea por linea) de cada archivo.

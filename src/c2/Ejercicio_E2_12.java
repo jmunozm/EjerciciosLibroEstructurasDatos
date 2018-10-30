@@ -22,20 +22,20 @@ public class Ejercicio_E2_12 {
 			arreglo1 = asignarValores(arreglo1);
 			
 			//Para pruebas
-			arreglo1 = new double[12]; //1, 1, 1, 4, 4, 5, 5, 5, 7, 8, 9, 9, 9
-			arreglo1[0] = 4;
-			arreglo1[1] = 4;
-			arreglo1[2] = 4;
+			arreglo1 = new double[13]; //1, 1, 1, 4, 4, 5, 5, 5, 7, 8, 9, 9, 9
+			arreglo1[0] = 1;
+			arreglo1[1] = 1;
+			arreglo1[2] = 1;
 			arreglo1[3] = 4;
 			arreglo1[4] = 4;
-			arreglo1[5] = 4;
-			arreglo1[6] = 4;
-			arreglo1[7] = 4;
-			arreglo1[8] = 4;
-			arreglo1[8] = 4;
-			arreglo1[10] = 4;
-			arreglo1[11] = 4;
-			arreglo1[12] = 4;
+			arreglo1[5] = 5;
+			arreglo1[6] = 5;
+			arreglo1[7] = 5;
+			arreglo1[8] = 7;
+			arreglo1[9] = 8;
+			arreglo1[10] = 9;
+			arreglo1[11] = 9;
+			arreglo1[12] = 9;
 			imprimirArreglo(arreglo1);
 			System.out.println("SUM: " + sum(arreglo1));
 			System.out.println("MEDIA: " + average(arreglo1));
@@ -62,6 +62,9 @@ public class Ejercicio_E2_12 {
 				matriz[i][1]++;	
 			}
 		}
+		
+		ordenarMatriz(matriz);
+		
 		double max = 0;
 		for(int i = 0; i<matriz.length; i++){
 			System.out.println(matriz[i][0] +" "+ matriz[i][1]);
@@ -71,8 +74,32 @@ public class Ejercicio_E2_12 {
 			}
 		}
 		
+		
+		
 		return max;
-	}	
+	}
+	
+	public static double[][] ordenarMatriz(double [][]matriz){
+		
+		int pos1 = 0;
+		
+		for(int i = 0; i<matriz.length; i++) {
+			
+			if(matriz[i][1] == 0 && pos1 == 0) {
+				pos1=i;
+			}
+			if(matriz[i][1] != 0 && pos1 != 0) {
+				matriz[pos1][0]=matriz[i][0];
+				matriz[pos1][1]=matriz[i][1];
+				matriz[i][0]=0;
+				matriz[i][1]=0;
+				i = pos1 -1;
+				pos1 = 0;
+			}
+		}
+		
+		return matriz;
+	}
 	
 	public static double average(double [] arr){
 		return sum(arr) / arr.length;
