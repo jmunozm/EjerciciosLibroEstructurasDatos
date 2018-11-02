@@ -47,14 +47,14 @@ public class ValidadorArchivo510 {
 	public static void listFile(String fileName){
 		Scanner fileIn = null;
 		int numeroLinea = 0;
-		int num_Operac = 0;
-		int num_Ventas = 0;
+		int trailer_num_operac = 0;
+		int trailer_num_Ventas = 0;
 		int [][]totalesOperaciones = new int[2][2]; 
 		System.out.println("FILE: " + fileName);
 		try {
 			fileIn = new Scanner(new FileReader(fileName));
-			int totalVentas = 0;
-			int totalOperaciones = 0;
+			int registrosTotalVentas = 0;
+			int registrosTotalOperaciones = 0;
 			
 			while(fileIn.hasNextLine()){
 				
@@ -75,10 +75,10 @@ public class ValidadorArchivo510 {
 				
 				if(onLine.substring(0,7).trim().equalsIgnoreCase("TRAILER")){
 					//System.out.println(onLine.substring(17,24));
-					num_Operac = new Integer(onLine.substring(8, 16)).intValue();
-					num_Ventas = new Integer(onLine.substring(17, 23)).intValue();
-					totalesOperaciones[0][0] = num_Operac; //total operaciones
-					totalesOperaciones[1][0] = num_Ventas; //total ventas
+					trailer_num_operac = new Integer(onLine.substring(8, 16)).intValue();
+					trailer_num_Ventas = new Integer(onLine.substring(17, 23)).intValue();
+					totalesOperaciones[0][0] = trailer_num_operac; //total operaciones
+					totalesOperaciones[1][0] = trailer_num_Ventas; //total ventas
 					
 					continue;
 				}
@@ -86,9 +86,9 @@ public class ValidadorArchivo510 {
 				if(onLine.length()==LONGITUD_LINEA){
 					if(!onLine.substring(479, 481).equalsIgnoreCase("  ")){
 						if(onLine.substring(46, 48).equalsIgnoreCase("01") || onLine.substring(46, 48).equalsIgnoreCase("18") || onLine.substring(46, 48).equalsIgnoreCase("26")){
-							totalVentas++;	
+							registrosTotalVentas++;	
 						}
-						totalOperaciones++;
+						registrosTotalOperaciones++;
 						//System.out.println(onLine.substring(47, 49));
 					}
 				}
@@ -96,8 +96,8 @@ public class ValidadorArchivo510 {
 			}
 //			System.out.println("totalVentas: "+totalVentas);
 //			System.out.println("num_Operac: " + num_Operac);
-			totalesOperaciones[0][1]=totalOperaciones;
-			totalesOperaciones[1][1]=totalVentas;
+			totalesOperaciones[0][1]=registrosTotalOperaciones;
+			totalesOperaciones[1][1]=registrosTotalVentas;
 //			System.out.println("totalVentas: "+totalesOperaciones[1][0]);
 //			System.out.println("totalVentas: "+totalesOperaciones[1][1]);
 			System.out.println(validaTotalOperaciones(totalesOperaciones));

@@ -1,0 +1,839 @@
+*       *********************************************************
+*       *                                                         
+*       * 17/04/2017           TDREFOCO.SPR              17:48:45 
+*       *                                                         
+*       *********************************************************
+*       *                                                         
+*       * Lic. Manuel Rivero Santos e Ing. Jaime Rivero Santos           
+*       *                                                         
+*       * Copyright (c) 2017 Company Name                         
+*       * Address                                                 
+*       * City,     Zip                                           
+*       *                                                                                                     
+*       *    
+*       *                                                         
+*       *********************************************************
+
+
+#REGION 0
+REGIONAL m.currarea, m.talkstat, m.compstat
+
+IF SET("TALK") = "ON"
+	SET TALK OFF
+	m.talkstat = "ON"
+ELSE
+	m.talkstat = "OFF"
+ENDIF
+m.compstat = SET("COMPATIBLE")
+SET COMPATIBLE FOXPLUS
+
+m.rborder = SET("READBORDER")
+SET READBORDER ON
+
+*       *********************************************************
+*       *                                                         
+*       *               Windows Window definitions                
+*       *                                                         
+*       *********************************************************
+*
+
+IF NOT WEXIST("tdreccoo") ;
+	OR UPPER(WTITLE("TDRECCOO")) == "TDRECCOO.PJX" ;
+	OR UPPER(WTITLE("TDRECCOO")) == "TDRECCOO.SCX" ;
+	OR UPPER(WTITLE("TDRECCOO")) == "TDRECCOO.MNX" ;
+	OR UPPER(WTITLE("TDRECCOO")) == "TDRECCOO.PRG" ;
+	OR UPPER(WTITLE("TDRECCOO")) == "TDRECCOO.FRX" ;
+	OR UPPER(WTITLE("TDRECCOO")) == "TDRECCOO.QPR"
+	DEFINE WINDOW tdreccoo ;
+		AT  1.500, 12.000  ;
+		SIZE 20.077,83.000 ;
+		TITLE "Recepción de Formato 510" ;
+		FONT "MS Sans Serif", 8 ;
+		NOFLOAT ;
+		NOCLOSE ;
+		NOMINIMIZE ;
+		DOUBLE ;
+		COLOR RGB(,,,192,192,192)
+	MOVE WINDOW tdreccoo CENTER
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *         TDREFOCO/Windows Setup Code - SECTION 2         
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+=UtCreTab('CtConPOS')
+=UtCreTab('TaConPOS')
+=UtCreTab('SODIAFES','SODIAFES','CSD')
+=UtCreTab('CTBICOOP','CTBICOOP')
+=UtCreTab('CTBICOOP','CTBICOOC','CQN')
+
+SELECT TACONPOS
+	SCATTER MEMVAR BLANK	
+	
+SELECT CTCONPOS
+	SCATTER MEMVAR BLANK
+
+vStatus	= 'Datos no leidos.'
+SumTotal = ROUND(0.00, 2) && Monto Total del Archivo
+
+*vBco_Fecha	= xFecha
+vBco_Fecha	= SoAntDia(xFecha-1)
+vPar_FecAct	= xFecha - 1
+m.FechaAux	= SoAntDia(vPar_FecAct)
+vPar_FecAct = m.FechaAux
+vValidaFecha	= 0
+
+*       *********************************************************
+*       *                                                         
+*       *             TDREFOCO/Windows Screen Layout              
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+IF WVISIBLE("tdreccoo")
+	ACTIVATE WINDOW tdreccoo SAME
+ELSE
+	ACTIVATE WINDOW tdreccoo NOSHOW
+ENDIF
+@ 1.154,3.000 SAY "  Este proceso  toma  la  información de las confirmaciones" + CHR(13) + ;
+		"de  cargos o  abonos (ventas y devoluciones) que contiene " + CHR(13) + ;
+		"el formato 510, enviado por PROSA, y los carga al sistema." + CHR(13) + ;
+		" " + CHR(13) + ;
+		"  Este  proceso    NO APLICA   los  cargos  o  abonos  a  las " + CHR(13) + ;
+		"cuentas." ;
+	SIZE 6.000,55.857, 0.000 ;
+	FONT "System", 10 ;
+	STYLE "BT" ;
+	COLOR RGB(128,0,0,,,,)
+@ 0.385,1.000 TO 19.693,82.200 ;
+	PEN 1, 8 ;
+	COLOR RGB(128,128,128,,,,)
+@ 0.769,2.000 TO 19.307,81.200 ;
+	PEN 1, 8 ;
+	COLOR RGB(128,128,128,,,,)
+@ 0.385,1.000 TO 0.385,82.200 ;
+	PEN 1, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 19.231,2.000 TO 19.231,81.000 ;
+	PEN 1, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 0.846,81.000 TO 19.308,81.000 ;
+	PEN 1, 8 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 0.385,1.000 TO 19.693,1.000 ;
+	PEN 1, 8 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 8.923,1.800 TO 8.923,80.800 ;
+	PEN 1, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 8.846,2.000 TO 8.846,81.000 ;
+	PEN 1, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 12.615,8.000 SAY "Formato 510" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT"
+@ 14.385,7.800 TO 15.693,49.400 ;
+	PEN 1, 8 ;
+	COLOR RGB(128,128,128,,,,)
+@ 14.385,49.200 TO 15.616,49.200 ;
+	PEN 1, 8 ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 9.615,8.000 SAY "Status :" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT"
+@ 11.615,1.800 TO 11.615,80.800 ;
+	PEN 1, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 11.538,2.000 TO 11.538,81.000 ;
+	PEN 1, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 16.231,1.800 TO 16.231,80.800 ;
+	PEN 1, 8 ;
+	STYLE "1" ;
+	COLOR RGB(128,128,128,128,128,128)
+@ 16.154,2.000 TO 16.154,81.000 ;
+	PEN 1, 8 ;
+	STYLE "1" ;
+	COLOR RGB(255,255,255,255,255,255)
+@ 12.615,40.000 SAY "Fecha :" ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "BT" ;
+	COLOR RGB(0,0,128,,,,)
+@ 12.692,51.600 SAY vBco_Fecha ;
+	SIZE 1.000,12.000 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B"
+@ 14.538,8.400 GET vNomArch ;
+	SIZE 1.000,40.200 ;
+	DEFAULT " " ;
+	FONT "MS Sans Serif", 8 ;
+	PICTURE "@K"
+@ 14.231,51.000 GET vArchEnt ;
+	PICTURE "@*HN Examinar" ;
+	SIZE 1.615,9.667,0.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _4wa126fb7()
+@ 9.615,18.400 SAY vStatus ;
+	SIZE 1.000,39.200 ;
+	FONT "MS Sans Serif", 8 ;
+	COLOR RGB(128,0,0,,,,)
+@ 16.923,39.000 GET m.Opcion ;
+	PICTURE "@*HT Leer datos;Salir" ;
+	SIZE 1.923,16.167,1.667 ;
+	DEFAULT 1 ;
+	FONT "MS Sans Serif", 8 ;
+	STYLE "B" ;
+	VALID _4wa126fbu()
+
+IF NOT WVISIBLE("tdreccoo")
+	ACTIVATE WINDOW tdreccoo
+ENDIF
+
+READ CYCLE ;
+	VALID _4wa126fc2() ;
+	SHOW _4wa126fc3()
+
+RELEASE WINDOW tdreccoo
+
+#REGION 0
+
+SET READBORDER &rborder
+
+IF m.talkstat = "ON"
+	SET TALK ON
+ENDIF
+IF m.compstat = "ON"
+	SET COMPATIBLE ON
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       *              TDREFOCO/Windows Cleanup Code              
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+=UtBorTab('CtConPOS')
+
+=UtBorTab('TaConPOS')
+
+=UtBorTab('SODIAFES')
+
+IF USED('Bco')
+	SELECT Bco
+	USE	
+ENDIF
+***************************************************
+* Procedimiento para lectura del archivo
+***************************************************
+
+
+*       *********************************************************
+*       *                                                         
+*       *  TDREFOCO/Windows Supporting Procedures and Functions   
+*       *                                                         
+*       *********************************************************
+*
+
+#REGION 1
+PROCEDURE Lee_Archivo
+
+vStatus = ''
+
+IF !file(vNomArch)
+	??chr(7)
+	=UtMensaje("No se encontro el formato 510:  " + vNomArch + "!!")
+	vStatus = 'Error en lectura.'
+	SHOW GETS
+	RETURN
+ENDIF
+
+&&Valida que las transacciones del 510 sean en pesos
+
+IF substr(JustFName(vNomArch), 1 ,5) != "I0077"
+	??chr(7)
+	=UtMensaje("El archivo 510 no es de pesos")
+	vStatus = 'Error en lectura.'
+	SHOW GETS
+	RETURN
+ENDIF
+
+************* Copia el Archivo en F:\SYBASE\DATOS\TD\
+
+vOriArch = vNomArch   &&Archivo de diskette que se va a copiar F:
+
+anio = right(alltrim(str(YEAR(xfecha))),2)
+mes = right('00'+alltrim(str(MONTH(xfecha))),2)
+dia = right('00'+alltrim(str(DAY(xfecha))),2)
+
+vnombre = 'VI' + anio+mes+dia
+
+Nuevo ='F:\SYBASE\DATOS\TD\'+vnombre
+Punto = '000'
+
+DO WHILE FILE(Nuevo+'.'+Punto)	
+	suma  = val(Punto) + 1
+	Punto = right('000'+alltrim(str(suma)),3)
+ENDDO
+
+Nuevo = Nuevo +'.'+ Punto
+COPY FILE &vOriArch TO &Nuevo
+*************************************************************************
+
+For510 = fopen(vNomArch,0)	&& Abrir archivo
+IF For510 == -1
+	=UtMensaje("Incapaz de abrir archivo de FORMATO 510")
+	DO Salida
+	RETURN
+ENDIF
+
+err_arch		= fcreate("datos\td\err.txt")	&& Archivo de bitácora de errores en detalle
+
+Reg = fgets(For510,511)
+
+************* Validación de registro encabezado *************
+
+&& Verificar que el primer registro sea el "HEADER"
+IF substr(Reg, 1, 10) != "HEADER"
+	=UtMensaje("El archivo no trae registro 'HEADER' (err001)")
+	DO Salida
+	RETURN
+ENDIF
+
+&& Verificar que la institución emisora
+IF Alltrim(substr(Reg, 12, 20)) != 'PROSA'		&& PROSA
+	=UtMensaje("Institución emisora no es PROSA (err002)")
+	DO Salida
+	RETURN
+ENDIF
+
+&& Verificar que la institución receptora especificada en el archivo sea BANREGIO
+IF Alltrim(substr(Reg, 33, 20)) != 'BANREGIO, S.A.'		&& Institución recerptora: BANREGIO
+	=UtMensaje("Institución receptora del archivo no es BANREGIO (err003)")
+	DO Salida
+	RETURN
+ENDIF
+
+&& Verificar la fecha del archivo
+m.Fec_Archivo = ctod(substr(Reg,77,2)+'/'+substr(Reg,75,2)+'/20'+substr(Reg,73,2))
+
+*IF m.Fec_Archivo != xFecha - 1
+*	=UtMensaje("El archivo no es del día de hoy (err004)")
+*	DO Salida
+*	RETURN
+*ENDIF
+
+&& Verificar el consecutivo
+IF val(substr(Reg, 93, 5)) != 0					&& Consecutivo
+	=UtMensaje("Consecutivo invalido (err005)")
+	DO Salida
+	RETURN
+ENDIF
+
+&& Verificar tipo de proceso (PRUEBA, PRODUCCION o REPRODUCCION)
+*IF Alltrim(substr(Reg, 114, 10)) !=  'prod'		&& Tipo de proceso
+IF Alltrim(substr(Reg, 114, 10)) != 'PRODUCCION'		&& Tipo de proceso
+	=UtMensaje("Tipo de proceso invalido (err006)")
+	DO Salida
+	RETURN
+ENDIF
+
+	
+
+m.Num_Operac	= 0
+m.Tot_Operac	= 0
+							&& Totales por tipo de operacion
+m.Num_Ventas	= 0			&& 01 Ventas
+m.Num_DisSuc	= 0			&& 02 Disposiciones en Sucursal
+m.Num_Pagos		= 0			&& 20 Pagos
+m.Num_Devolu	= 0			&& 21 Devoluciones
+
+							&& Importes por tipo de operacion
+m.Tot_Ventas	= 0			&& 01 Ventas
+m.Tot_DisSuc	= 0			&& 02 Disposiciones en Sucursal
+m.Tot_Pagos		= 0			&& 20 Pagos
+m.Tot_Devolu	= 0			&& 21 Devoluciones
+m.Con_TipArc	= 'P'		&& 510 en Pesos
+
+DO WHILE !FEOF(For510)
+	Reg = fgets(For510,511)
+
+	*********** Validación de registros de sumario general ***********
+	IF Alltrim(substr(Reg, 1, 7)) = 'TRAILER'  OR substr(Reg, 1, 7) =' TRILER'
+		&& Verificar total de registros del detalle
+		IF val(substr(Reg, 9, 8)) != m.Num_Operac
+			DO UtMensNoWait WITH 'T', ''
+			=UtMensaje("Número de registros de detalle incorrecto (err007)")
+			DO Salida2
+			RETURN
+		ENDIF
+
+
+*		&& Validar el número de operaciones de venta
+		IF val(substr(Reg, 18, 6)) != m.Num_Ventas
+			DO UtMensNoWait WITH 'T', ''
+			=UtMensaje("Número de operaciones de venta incorrecto (err008) " )
+			DO Salida2
+			RETURN
+		ENDIF
+		
+*		&& Validar el monto por operaciones de venta
+		IF round(m.Tot_Ventas,2) != round(val(substr(Reg, 25, 13)) + (val(substr(Reg, 38, 2)) * .01),2)
+			DO UtMensNoWait WITH 'T', ''
+		   =UtMensaje("Importe total de operaciones de venta diferente a la suma total (err009)")
+			DO Salida2
+			RETURN
+		ENDIF
+		
+*		&& Validar el número de disposiciones en sucursal
+		IF val(substr(Reg, 41, 6)) != m.Num_DisSuc
+			DO UtMensNoWait WITH 'T', ''
+			=UtMensaje("Número de disposiciones en sucursal incorrecto (err010)")
+			DO Salida2
+			RETURN
+		ENDIF
+		
+*		&& Validar el monto por disposiciones en sucursal
+		IF m.Tot_DisSuc != round(val(substr(Reg, 48, 13)) + (val(substr(Reg, 61, 2)) * .01),2)
+			DO UtMensNoWait WITH 'T', ''
+		   =UtMensaje("Importe total de disposiciones en sucursal diferente a la suma total (err011)")
+			DO Salida2
+			RETURN
+		ENDIF
+		
+*		&& Validar el número de Pagos
+
+		IF val(substr(Reg, 87, 6)) != m.Num_Pagos
+			DO UtMensNoWait WITH 'T', ''
+			=UtMensaje("Número de pagos incorrecto (err012)")
+			DO Salida2
+			RETURN
+		ENDIF
+		
+*		&& Validar el monto por pagos
+		IF round(m.Tot_Pagos,2) != round(val(substr(Reg, 94, 13)) + (val(substr(Reg, 107, 2)) * .01),2)
+			DO UtMensNoWait WITH 'T', ''
+		   =UtMensaje("Importe total de pagos diferente a la suma total (err013)")
+			DO Salida2
+			RETURN
+		ENDIF
+
+*		&& Validar el número de devoluciones
+		IF val(substr(Reg, 110, 6)) != m.Num_Devolu
+			DO UtMensNoWait WITH 'T', ''
+			=UtMensaje("Número de devoluciones incorrecto (err014)")
+			DO Salida2
+			RETURN
+		ENDIF
+		
+*		&& Validar el monto por devoluciones
+		IF round(m.Tot_Devolu,2) != round(val(substr(Reg, 117, 13)) + (val(substr(Reg, 130, 2)) * .01),2)
+			DO UtMensNoWait WITH 'T', ''
+		   =UtMensaje("Importe total de devoluciones diferente a la suma total (err015)")
+			DO Salida2
+			RETURN
+		ENDIF
+		
+		EXIT
+	ENDIF
+	
+	*********** Validación y generación de los registros de detalle ***********
+	&& Si el registro es de detalle
+	IF substr(Reg, 480, 2) != '  '
+	
+		m.Con_BaReTx	=  substr(Reg, 392, 5)
+		
+		m.Con_Tarjeta	=  substr(Reg, 6, 19)
+		m.Con_PobCom	=  substr(Reg, 346, 13)
+		m.Con_TipTra	=  substr(Reg, 47, 2)
+		m.Con_Cantid	=  round(val(substr(Reg, 80, 11)) + (val(substr(Reg, 91, 2)) * .01),2)
+		m.Con_ImpCas	=  round(val(substr(Reg, 93, 11)) + (val(substr(Reg, 104, 2)) * .01),2)
+
+		*IF substr(Reg, 109, 3) = '000' && Si son pesos...
+		*	m.Con_CanCon	=  0
+		*	m.Con_MonCon	=  ''
+		*ELSE
+		*	m.Con_CanCon	=  round(val(substr(Reg, 51, 11)) + (val(substr(Reg, 62, 2)) * .01),2)
+		*	m.Con_MonCon	=  substr(Reg, 77, 3)
+		*ENDIF
+		
+		m.Con_CanCon	=  round(val(substr(Reg, 51, 11)) + (val(substr(Reg, 62, 2)) * .01),2)
+		m.Con_MonCon	=  substr(Reg, 77, 3)
+		
+		vCon_FecPro		=  ctod(substr(Reg,45,2)+'/'+substr(Reg,43,2)+'/20'+substr(Reg,41,2))
+		
+		m.Con_TipCam	=  round(val(substr(Reg, 109, 3)) + (val(substr(Reg, 112, 4)) * .0001),4)
+		
+		m.Con_FecPro	=  UtDateToChar(vCon_FecPro)
+		m.Con_NumAfi	=  substr(Reg, 243, 15)
+		m.Con_NomCom	=  strtran(substr(Reg, 263, 30), '"', "'")
+		m.Con_Refere	=  substr(Reg, 397, 23)
+		m.Con_GiCoNa	=  substr(Reg, 258, 5)
+		
+		m.Con_EmPaEl	=  substr(Reg, 429, 16)
+		
+		m.Con_PlaMes	=  val(substr(Reg, 425, 2))
+		
+		m.Con_NumAut	=  substr(Reg, 386, 6)
+		vCon_FecCon		=  ctod(substr(Reg,33,2)+'/'+substr(Reg,31,2)+'/20'+substr(Reg,29,2))
+		m.Con_FecCon	=  UtDateToChar(vCon_FecCon)
+		
+		m.Con_Origen	= ' '
+		
+		DO CASE
+			CASE substr(Reg, 49, 2)	= '02'
+				m.Con_Origen	= '06'
+			CASE substr(Reg, 49, 2)	= '03'
+				m.Con_Origen	= '06'
+			CASE substr(Reg, 49, 2)	= '05'
+				m.Con_Origen	= '01'
+			CASE substr(Reg, 49, 2)	= '06'
+				m.Con_Origen	= '09'
+			CASE substr(Reg, 49, 2)	= '61'
+				m.Con_Origen	= '09'
+		ENDCASE
+		
+		IF m.Con_Origen	= ' '
+			m.Con_Origen	= '22'
+		ENDIF
+			
+		m.Con_GiCoIn	=  substr(Reg, 258, 5)
+		m.Con_IdTerm	=  substr(Reg, 470, 10)
+		m.Con_RfcCom	=  substr(Reg, 366, 13)
+		m.Con_ForPag	=  substr(Reg, 488, 1)
+		
+		m.Con_ImpCom	=  round(val(substr(Reg, 186,	13)) * .01, 2)
+		m.Con_ImpCuI	=  round(val(substr(Reg, 152,	17)) * .01, 2)
+		m.Con_IndInt	=  substr(Reg, 49,	2)
+		m.Con_ImpTot	=  round(val(substr(Reg, 80, 11)) + (val(substr(Reg, 91, 2)) * .01), 2)
+		
+		m.Con_CodPos	=  substr(Reg, 336, 10)
+		m.Con_PorCul	=  round(val(substr(Reg, 359,	5)) * .01, 2)
+		m.Con_FamCom	=  substr(Reg, 364, 2)
+		
+		m.Con_TrCoPD	= substr(Reg, 423,	2)
+		m.Con_PaNuMe	= substr(Reg, 425,	2)
+		m.Con_TipPla	= substr(Reg, 427,	2)
+		m.Con_SobTas	= round(val(substr(Reg, 429,	8)) * .01, 2)
+		m.Con_IvSoTa	= round(val(substr(Reg, 437,	7)) * .01, 2)
+		m.Con_PoSoTa	= round(val(substr(Reg, 444,	5)) * .01, 2)
+		m.Con_InCoAu	= substr(Reg, 449,	1)
+		
+		IF substr(Reg, 25, 1) = 'C'		
+			INSERT INTO TACONPOS FROM MEMVAR		
+		ELSE
+			INSERT INTO CTCONPOS FROM MEMVAR		
+		ENDIF
+
+
+		m.Num_Operac	= m.Num_Operac + 1
+		m.Tot_Operac	= m.Tot_Operac + m.Con_Cantid
+		DO CASE
+			CASE INLIST (m.Con_TipTra, '01', '18', '26')
+				m.Num_Ventas	= m.Num_Ventas + 1
+				m.Tot_Ventas	= m.Tot_Ventas + m.Con_Cantid
+			CASE m.Con_TipTra	= '02'
+				m.Num_DisSuc	= m.Num_DisSuc+ 1
+				m.Tot_DisSuc	= m.Tot_DisSuc + m.Con_Cantid
+			CASE m.Con_TipTra	= '20'
+				m.Num_Pagos		= m.Num_Pagos + 1
+				m.Tot_Pagos		= m.Tot_Pagos + m.Con_Cantid
+			CASE INLIST (m.Con_TipTra, '21', '25')
+				m.Num_Devolu	= m.Num_Devolu + 1
+				m.Tot_Devolu	= m.Tot_Devolu + m.Con_Cantid
+		ENDCASE	
+	ENDIF
+	DO UtMensNoWait WITH 'I', 'Procesando '+ALLTRIM(STR(m.Num_Operac))
+
+ENDDO
+
+IF Alltrim(substr(Reg, 1, 7)) != 'TRAILER'  AND substr(Reg, 1, 7) !=' TRILER'
+	&& Verificar que el último registro fué el triler
+	DO UtMensNoWait WITH 'T', ''
+	=UtMensaje("El archivo no trae registro 'TRAILER' (err016)")
+	DO Salida2
+	RETURN
+ENDIF
+
+= fclose(err_arch)
+= fclose(For510)
+
+SELECT CtBiCoOp
+=UtIniTab('CtBiCoOp')
+m.Bco_Fecha	= 	UtDateToChar(vBco_Fecha)
+m.Bco_TipArc = 'P'
+INSERT INTO CtBiCoOp FROM MEMVAR
+
+DO UtMensNoWait WITH 'I', 'Enviando informacion al servidor...'
+
+
+
+=UtAfecta('ZTT', 'CtBiCoOp')	&& TATMPCCOBAJ
+=UtAfecta('ZTS', 'CtBiCoOp') 	&& CTTMPCCOBAJ
+
+
+DIMENSION xArrTran(3, 2)  && La x al inicio es debido a UtAfecta()
+
+xArrTran(1,1)='ZTR'
+xArrTran(1,2)='CtConPos'
+xArrTran(2,1)='ZTQ'
+xArrTran(2,2)='TaConPos'
+xArrTran(3,1)='ZTU'
+xArrTran(3,2)='CtBiCoOp'
+
+m.Respuesta = UtAfecta('', '', '', 'xArrTran')
+
+&&m.Respuesta = UtAfecta('ZTQ','TaConPos')
+
+
+IF (m.Respuesta>0)	&& Existe Algún Error
+	DO UtMensNoWait WITH 'T', ''
+	=UtMensaje("LA GENERACION DE ARCHIVO NO FUE EXITOSA, EL PROGRAMA SERA TERMINADO")
+	vStatus = 'Error en lectura.'
+	SHOW GETS
+	CLEAR READ
+	RETURN
+ENDIF
+
+vStatus = 'Lectura exitosa.'
+
+Procesados = RECCOUNT('TaConPos') + RECCOUNT('CtConPos')
+
+DO UtMensNoWait WITH 'T', ''
+=UtMensaje("Generación de archivo exitosa,se procesaron " + ALLTRIM(STR(Procesados)) + " registros.")
+_CUROBJ = 1
+SHOW GETS
+
+RETURN
+
+***************************************************
+PROCEDURE	GrabaErr
+***************************************************
+	err = fwrite(err_arch, UtCerIzq(m.Num_Operac, 6) + ':' + Reg)
+	vStatus = 'Error en lectura.'
+	SHOW GETS
+	= fclose(For510)
+RETURN
+
+***************************************************
+PROCEDURE Salida
+***************************************************
+	= fclose(For510)
+	vStatus = 'Error en lectura.'
+	SHOW GETS
+RETURN
+
+***************************************************
+PROCEDURE Salida2
+***************************************************
+	vStatus = 'Error en lectura.'
+	SHOW GETS
+	= fclose(err_arch)
+	= fclose(For510)
+RETURN
+
+*************
+PROCEDURE ValidaFecha
+*************
+
+vValidaFecha = 0
+return 0
+SELECT CtBiCoOC
+=UtIniTab('CtBiCoOC')
+m.Bco_Fecha	= 	UtDateToChar(vBco_Fecha)
+m.Tip_Consul = 'C1'
+m.Tip_Archiv = 'P'
+INSERT INTO CtBiCoOC FROM MEMVAR
+m.Respuesta = UtAfecta('CQN', 'CtBiCoOC', 'Bco')
+IF (m.Respuesta>0)	&& Existe Algún Error
+	=UtMensaje("Existio un error al consultar la fecha, favor de comunicarse a sistemas!!!")
+	vValidaFecha = 1
+ELSE
+
+	IF Bco.Sta_FecVal	= 'C'
+		=UtMensaje("Ya subio la información para la fecha " + UtD3M(UtCharToDate(Bco.Fec_Valida), .T.))
+		SHOW GET vArchEnt DISABLE
+		SHOW GET vNomArch DISABLE
+		vValidaFecha = 1
+	ELSE
+		IF Bco.Sta_FecVal	= 'N'
+			=UtMensaje("No puede subir información para esta fecha, aún no sube la del " + UtD3M(UtCharToDate(Bco.Fec_Valida), .T.))
+			SHOW GET vArchEnt DISABLE
+			SHOW GET vNomArch DISABLE
+			vValidaFecha = 1
+			*_CUROBJ = 1
+			*RETURN
+		ENDIF
+	ENDIF
+ENDIF
+
+*       *********************************************************
+*       *                                                         
+*       * _4WA126FB7           vArchEnt VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         TDREFOCO,     Record Number:   22  
+*       * Variable:            vArchEnt                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      1                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _4wa126fb7     &&  vArchEnt VALID
+#REGION 1
+IF UtLastKey()
+	RETURN
+ENDIF
+
+IF !USED('Bco')
+	SELECT CtBiCoOC
+	=UtIniTab('CtBiCoOC')
+	m.Bco_Fecha	= 	UtDateToChar(vBco_Fecha)
+	m.Tip_Consul = 'C1'
+	m.Tip_Archiv = 'P'
+	INSERT INTO CtBiCoOC FROM MEMVAR
+	m.Respuesta = UtAfecta('CQN', 'CtBiCoOC', 'Bco')
+
+	IF (m.Respuesta>0)	&& Existe Algún Error
+		=UtMensaje("Existio un error al consultar la fecha, favor de comunicarse a sistemas!!!")
+		_CUROBJ = 1
+		RETURN
+	ENDIF
+
+	IF Bco.Sta_FecVal	= 'C'
+		=UtMensaje("Ya subio la información para la fecha " + UtD3M(UtCharToDate(Bco.Fec_Valida), .T.))
+		&&SHOW GET vArchEnt DISABLE
+		&&SHOW GET vNomArch DISABLE
+		&&_CUROBJ = 1
+		&&RETURN
+	ELSE
+		IF Bco.Sta_FecVal	= 'N'
+**			=UtMensaje("No puede subir información para esta fecha, aún no sube la del " + UtD3M(UtCharToDate(Bco.Fec_Valida), .T.))
+**			SHOW GET vArchEnt DISABLE
+**			SHOW GET vNomArch DISABLE
+**			_CUROBJ = 1
+**			RETURN
+		ENDIF
+	ENDIF
+ENDIF
+
+PRIVATE NomArch
+NomArch = GETFILE('*','Archivo CECOBAN','Select',0)  && Obtenemos archivo
+
+IF (!EMPTY(NomArch))		&& Si lo encontramos
+	vNomArch = NomArch		&& Asignamos a la variable
+	SHOW GET vNomArch
+ENDIF
+
+
+*       *********************************************************
+*       *                                                         
+*       * _4WA126FBU           m.Opcion VALID                     
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         TDREFOCO,     Record Number:   24  
+*       * Variable:            m.Opcion                           
+*       * Called By:           VALID Clause                       
+*       * Object Type:         Push Button                        
+*       * Snippet Number:      2                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _4wa126fbu     &&  m.Opcion VALID
+#REGION 1
+DO CASE
+	CASE m.Opcion = 1	
+		DO ValidaFecha
+		IF vValidaFecha = 1
+			_CUROBJ = 1
+			RETURN
+		ENDIF
+		vStatus = 'LEYENDO DATOS...'
+		SHOW GET m.Opcion DISABLE
+		SHOW GETS
+		DO Lee_Archivo
+		SHOW GET m.Opcion ENABLE
+	CASE m.Opcion = 2
+		CLEAR READ
+		RETURN
+ENDCASE
+
+*       *********************************************************
+*       *                                                         
+*       * _4WA126FC2           Read Level Valid                   
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         TDREFOCO                           
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      3                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _4wa126fc2     && Read Level Valid
+*
+* Valid Code from screen: TDREFOCO
+*
+#REGION 1
+IF _CUROBJ = 1
+	CLEAR READ
+	RETURN .T.
+ELSE
+	_CUROBJ=1
+	RETURN .F.
+ENDIF
+
+*       *********************************************************
+*       *                                                         
+*       * _4WA126FC3           Read Level Show                    
+*       *                                                         
+*       * Function Origin:                                        
+*       *                                                         
+*       *                                                         
+*       * From Platform:       Windows                            
+*       * From Screen:         TDREFOCO                           
+*       * Called By:           READ Statement                     
+*       * Snippet Number:      4                                  
+*       *                                                         
+*       *********************************************************
+*
+FUNCTION _4wa126fc3     && Read Level Show
+PRIVATE currwind
+STORE WOUTPUT() TO currwind
+*
+* Show Code from screen: TDREFOCO
+*
+#REGION 1
+IF SYS(2016) = "TDRECCOO" OR SYS(2016) = "*"
+	ACTIVATE WINDOW tdreccoo SAME
+	@ 9.615,18.400 SAY vStatus ;
+		SIZE 1.000,39.200, 0.000 ;
+		FONT "MS Sans Serif", 8 ;
+		COLOR RGB(128,0,0,,,,)
+ENDIF
+IF NOT EMPTY(currwind)
+	ACTIVATE WINDOW (currwind) SAME
+ENDIF

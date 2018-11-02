@@ -7,5 +7,6 @@ public class Ejemplos {
 				continue;
 			System.out.println(i);
 		}
+		System.out.println("55 in base 2: " + Integer.toString(55,2)); //Imprime la representación binaria de 55
 	}
 }

@@ -8,9 +8,10 @@ import java.util.Random;
  */
 public class Ejercicio_E2_12 {
 	
-	public static final int TAMANO_MAXIMO_ARREGLO = 10;
+	public static final int TAMANO_MINIMO_ARREGLO = 5;
+	public static final int TAMANO_MAXIMO_ARREGLO = 20;
 	public static final int VALOR_MAXIMO_RANDOM = 10;
-	public static final int NUMERO_ARREGLOS = 1;
+	public static final int NUMERO_ARREGLOS = 4;
 	
 	public static void main(String[] args) {
 		System.out.println("Arreglos tamaño randoom valores randoom");
@@ -21,21 +22,21 @@ public class Ejercicio_E2_12 {
 			arreglo1 = new double[valorRandoom(TAMANO_MAXIMO_ARREGLO)];
 			arreglo1 = asignarValores(arreglo1);
 			
-			//Para pruebas
-			arreglo1 = new double[13]; //1, 1, 1, 4, 4, 5, 5, 5, 7, 8, 9, 9, 9
-			arreglo1[0] = 1;
-			arreglo1[1] = 1;
-			arreglo1[2] = 1;
-			arreglo1[3] = 4;
-			arreglo1[4] = 4;
-			arreglo1[5] = 5;
-			arreglo1[6] = 5;
-			arreglo1[7] = 5;
-			arreglo1[8] = 7;
-			arreglo1[9] = 8;
-			arreglo1[10] = 9;
-			arreglo1[11] = 9;
-			arreglo1[12] = 9;
+//			//Para pruebas
+//			arreglo1 = new double[13]; //1, 1, 1, 4, 4, 5, 5, 5, 7, 8, 9, 9, 9
+//			arreglo1[0] = 1;
+//			arreglo1[1] = 1;
+//			arreglo1[2] = 1;
+//			arreglo1[3] = 4;
+//			arreglo1[4] = 4;
+//			arreglo1[5] = 5;
+//			arreglo1[6] = 5;
+//			arreglo1[7] = 5;
+//			arreglo1[8] = 7;
+//			arreglo1[9] = 8;
+//			arreglo1[10] = 9;
+//			arreglo1[11] = 9;
+//			arreglo1[12] = 9;
 			imprimirArreglo(arreglo1);
 			System.out.println("SUM: " + sum(arreglo1));
 			System.out.println("MEDIA: " + average(arreglo1));
@@ -44,7 +45,7 @@ public class Ejercicio_E2_12 {
 		}
 	}
 	
-	public static double mode(double [] arr){
+	public static String mode(double [] arr){
 		double arrModa [] = new double[arr.length];
 		double [][]matriz = new double[arr.length][2];
 		boolean guarda = true;
@@ -63,20 +64,30 @@ public class Ejercicio_E2_12 {
 			}
 		}
 		
-		ordenarMatriz(matriz);
+		matriz = ordenarMatriz(matriz);
 		
 		double max = 0;
 		for(int i = 0; i<matriz.length; i++){
-			System.out.println(matriz[i][0] +" "+ matriz[i][1]);
+			//System.out.println(matriz[i][0] +" "+ matriz[i][1]);
 			if(matriz[i][1]>max){
 				max=matriz[i][1];
 				i=0;
 			}
 		}
 		
+		String moda = "";
+		if(max>1){
+			for(int i = 0; i<matriz.length; i++){
+				if(matriz[i][1]==max){
+					moda+=matriz[i][0] + " ";
+				}
+			}	
+		}else{
+			moda = "NO hay Moda";
+		}
 		
 		
-		return max;
+		return moda;
 	}
 	
 	public static double[][] ordenarMatriz(double [][]matriz){
