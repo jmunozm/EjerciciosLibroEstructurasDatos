@@ -6,15 +6,15 @@ package c2;
 /**
  * @author Juan Munoz
  * Ejemplo para comprender el metodo compareTo
- * El método compareTo se usa para comparar dos cadenas, indicando que cadena es mayor que otra. 
+ * El mÃ©todo compareTo se usa para comparar dos cadenas, indicando que cadena es mayor que otra. 
  * 
- * - Número positivo: la cadena 1 es mayor que la cadena 2.
+ * - NÃºmero positivo: la cadena 1 es mayor que la cadena 2.
  * - 0: las cadenas son iguales.
- * - Número negativo: la cadena 1 es menor que la cadena 2.
+ * - NÃºmero negativo: la cadena 1 es menor que la cadena 2.
  * 
- * No sigue el alfabeto original sino según la tabla ASCII, es decir, que a es menor que z.
+ * No sigue el alfabeto original sino segÃºn la tabla ASCII, es decir, que a es menor que z.
  * Cuando las dos cadenas empiezan por los mismos caracteres y solo se diferencian 
- * en algún carácter, es ese carácter el que comparan.
+ * en algÃºn  carÃ¡cter, es ese carÃ¡cter el que comparan.
  */
 public class CompareTo {
 
@@ -25,8 +25,8 @@ public class CompareTo {
 		String texto1 = "americano";
 		String texto2 = "coche";
 		
-		texto1 = "mota";
-		texto2 = "mota";
+//		texto1 = "mota";
+//		texto2 = "mota";
 		
 		System.out.println(texto1.compareTo(texto2));
 		
