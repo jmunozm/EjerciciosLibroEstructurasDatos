@@ -49,7 +49,12 @@ public class ValidadorArchivo510 {
 		int numeroLinea = 0;
 		int trailer_num_operac = 0;
 		int trailer_num_Ventas = 0;
-		int [][]totalesOperaciones = new int[2][2]; 
+		int [][]totalesOperaciones = new int[2][2];
+		
+		String trailer = "TRAILER";
+		String filler = " ";
+		int totalDeTransaccionesDeDetalle = 0;
+		
 		System.out.println("FILE: " + fileName);
 		try {
 			fileIn = new Scanner(new FileReader(fileName));
@@ -101,6 +106,8 @@ public class ValidadorArchivo510 {
 //			System.out.println("totalVentas: "+totalesOperaciones[1][0]);
 //			System.out.println("totalVentas: "+totalesOperaciones[1][1]);
 			System.out.println(validaTotalOperaciones(totalesOperaciones));
+			
+			trailer += "TRAILER";
 			
 		} catch(IOException e) {
 			System.out.println(e);
